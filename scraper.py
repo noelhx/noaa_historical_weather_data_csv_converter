@@ -388,7 +388,7 @@ if __name__ == '__main__' :
 
     ## Pull out airport codes
     alist2b=alist2.split("\n") 
-    for ax1 in alist2b[32:]:  # 1-4, 6-20, 21-31, 33-43
+    for ax1 in alist2b[:]:  # 1-4, 6-20, 21-31, 33-43
         if ax1:
             print
             dt1= dt.now()
@@ -399,6 +399,6 @@ if __name__ == '__main__' :
             if scall not in ('HNL', 'SJU', 'DEN', 'FLL', 'HOU'):
                 print scodes2, ax2[-1]  
                 year1= 2013
-                NOAAdownload(usaf, wban, scall, year1)
+                #NOAAdownload(usaf, wban, scall, year1)
             dt2= dt.now()
             print '%s  | %s  seconds: %-4s' % (dt2.strftime('%Y-%m-%d %H:%M:%S'), (dt2-dt1), (dt2-dt1).seconds )
