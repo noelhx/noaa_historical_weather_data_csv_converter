@@ -4,6 +4,8 @@
 # Written by Eldan Goldenberg, Sep-Oct 2012
 # http://eldan.co.uk/ ~ @eldang ~ eldang@gmail.com
 
+# M Boldin modifications  12/7/2014 
+
 # This program is free software; you can redistribute it and/or
 #        modify it under the terms of the GNU General Public License
 #        as published by the Free Software Foundation; either version 2
