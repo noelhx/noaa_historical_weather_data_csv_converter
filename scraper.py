@@ -40,6 +40,7 @@
 ##    download with station letter code -->  Kxxx-122335566-344679
 ##    by year  ##   
 ##  
+
 ############################################################
 
 import os
@@ -52,7 +53,7 @@ import gzip
 import csv
 import urllib
 
-import pywapi
+#################################################################
 
 alist2= """
 1   ATL      722190    13874 | Atlanta         GA | Hartsfield-Jackson Atlanta International
