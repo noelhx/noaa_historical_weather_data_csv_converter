@@ -1,10 +1,116 @@
 #! /usr/bin/env python
 
+#########################################################
+                
+##NOAA weather data extract
+##  M Boldin  Sept 2014 -- Dec 2014
+
+## Extracts gz with daily data from ftp://ftp.ncdc.noaa.gov/pub/data/gsod/ 
+## Converts to csv file with columns
+#          "Station", "Year", "Month", "Day", 
+#          "MeanTemp", "NTempObs", "DewPoint", "NDewPointObs", 
+#          "SeaLevelPressure", "NSeaLevPressObs", "StationPressure", 
+#          "NStatPressObs", "Visibility", "NVisibilityObs", "MeanWindSpeed", 
+#          "NWindObs", "MaxSustWindSpeed", "MaxWindGust", "MaxTemp",  
+#          "MaxTempSource", "MinTemp", "MinTempSource", "PrecipAmount", 
+#          "NPrecipReportHours", "PrecipFlag", "SnowDepth", "Fog", "Rain", 
+#          "Snow", "Hail", "Thunder", "Tornado" 
+
+##   based on download and parse functions 
+##    written by Eldan Goldenberg, Sep-Oct 2012
+##    http://eldan.co.uk/ ~ @eldang ~ eldang@gmail.com
+                
+##    Need USAF &  WBAN codes
+##      "ftp://ftp.ncdc.noaa.gov/pub/data/inventories/ISH-HISTORY.TXT )\n")            
+                
+## Dec 2014  
+##   x--tested Station find & Download using USAF-WBAN codes
+##   x--next check parse of csv 
+##   --each year 30 seconds approx
+##   --skipped SJU San Juan PR
+##             HNL Honolulu,
+##             FLL Ft Lauderdaile problem acodes[20]
+##             DEN Denver
+##   x--dates for elapsed time
+##   x--created airport list 2 with USAF & WBAN codes, alist2 
+##   x--alist2 used in down load loop                  
+               
+##   ck snow depth =/ snowfall 
+##   ck precip flag  = G
+##    download with station letter code -->  Kxxx-122335566-344679
+##    by year  ##   
+##  
+############################################################
+
+import os
+import sys
+import datetime
+from datetime import datetime as dt
+import time
+
+import gzip
+import csv
+import urllib
+
+import pywapi
+
+alist2= """
+1   ATL      722190    13874 | Atlanta         GA | Hartsfield-Jackson Atlanta International
+2   ORD      725300    94846 | Chicago         IL | Chicago O'Hare International            
+3   LAX      722950    23174 | Los Angeles     CA | Los Angeles International               
+4   DFW      722590    03927 | Dallas/Fort Worth TX | Dallas/Fort Worth International         
+5   DEN      724670    03017 | Denver          CO | Denver International                    
+6   JFK      744860    94789 | New York        NY | John F. Kennedy International           
+7   SFO      724940    23234 | San Francisco   CA | San Francisco International             
+8   CLT      723140    13881 | Charlotte       NC | Charlotte Douglas International         
+9   LAS      723860    23169 | Las Vegas       NV | McCarran International                  
+10  PHX      722780    23183 | Phoenix         AZ | Phoenix Sky Harbor International        
+11  IAH      722430    12960 | Houston         TX | George Bush Intercontinental/Houston    
+12  MIA      722020    12839 | Miami           FL | Miami International                     
+13  MCO      722050    12815 | Orlando         FL | Orlando International                   
+14  EWR      725020    14734 | Newark          NJ | Newark Liberty International            
+15  SEA      727930    24233 | Seattle         WA | Seattle/Tacoma International            
+16  MSP      726580    14922 | Minneapolis     MN | Minneapolis-St Paul International       
+17  DTW      725370    94847 | Detroit         MI | Detroit Metro Wayne County              
+18  PHL      724080    13739 | Philadelphia    PA | Philadelphia International              
+19  BOS      725090    14739 | Boston          MA | Logan International                     
+20  LGA      725030    14732 | New York        NY | LaGuardia                               
+21  FLL      722025    12849 | Fort Lauderdale FL | Fort Lauderdale-Hollywood International 
+22  BWI      724060    93721 | Baltimore       MD | Baltimore/Washington International Thurgood Marshall
+23  IAD      724030    93738 | Washington      DC | Washington Dulles International         
+24  SLC      725720    24127 | Salt Lake City  UT | Salt Lake City International            
+25  DCA      724050    13743 | Washington      DC | Ronald Reagan Washington National       
+26  MDW      725340    14819 | Chicago         IL | Chicago Midway International            
+27  HNL      725340    14819 | Honolulu        HI | Honolulu International                  
+28  SAN      722900    23188 | San Diego       CA | San Diego International                 
+29  TPA      722110    12842 | Tampa           FL | Tampa International                     
+30  PDX      726980    24229 | Portland        OR | Portland International                  
+31  STL      724340    13994 | St. Louis       MO | Lambert-St. Louis International         
+32  HOU      722435    12918 | Houston         TX | William P Hobby                         
+33  OAK      724930    23230 | Oakland         CA | Metropolitan Oakland International      
+34  MCI      724460    03947 | Kansas City     MO | Kansas City International               
+35  BNA      723270    13897 | Nashville       TN | Nashville International                 
+36  AUS      722540    13904 | Austin          TX | Austin - Bergstrom International        
+37  RDU      723060    13722 | Raleigh/Durham  NC | Raleigh-Durham International            
+38  SNA      722977    93184 | Santa Ana       CA | John Wayne Airport-Orange County        
+39  SMF      724839    93225 | Sacramento      CA | Sacramento International                
+40  CLE      725240    14820 | Cleveland       OH | Cleveland-Hopkins International         
+41  MSY      722310    12916 | New Orleans     LA | Louis Armstrong New Orleans International
+42  SJU      722310    12916 | San Juan        PR | Luis Munoz Marin International          
+43  SJC      724945    23293 | San Jose        CA | Norman Y. Mineta San Jose International 
+44  SAT      722530    12921 | San Antonio     TX | San Antonio International               
+45  DAL      722580    13960 | Dallas          TX | Dallas Love Field                       
+46  PIT      725200    94823 | Pittsburgh      PA | Pittsburgh International                
+47  MKE      726400    14839 | Milwaukee       WI | General Mitchell International          
+48  RSW      722108    12894 | Fort Myers      FL | Southwest Florida International         
+49  IND      724380    93819 | Indianapolis    IN | Indianapolis International              
+50  MEM      723340    13893 | Memphis         TN | Memphis International
+"""
+
+## Using
 # Downloader for NOAA historical weather data
 # Written by Eldan Goldenberg, Sep-Oct 2012
 # http://eldan.co.uk/ ~ @eldang ~ eldang@gmail.com
-
-# M Boldin modifications  12/7/2014 
 
 # This program is free software; you can redistribute it and/or
 #        modify it under the terms of the GNU General Public License
@@ -44,34 +150,16 @@
 # TODO for scraperwiki: have it load in the whole list of stations and just
 #        iterate over them.
 
-import datetime
-from datetime import datetime as dt
-import urllib
-import os
-import gzip
-import time
-import csv
-import sys
-
-# Check for --verbose argument. You'll get more feedback if you use this.
-if len(sys.argv) == 1:
-    # then default to non-verbose
-    verbose = False
-elif sys.argv[1] == "--verbose":
-    verbose = True
-else:
-    verbose = False
+verbose = True
 
 # I've assumed you'll want the same number of years for every station you
 #        download in one session, so we ask this before going into the main loop.
-# maxyears = int(raw_input("How many years of data would you like to download " \
-#    "for each station?\n"))
-maxyears=1
+maxyears = 1
 
 # This function goes through each downloaded file line by line, and translates
 #        it from NOAA's idiosyncratic format to CSV with all the fields separated
 #        out rationally.
-def parsefile(f_in, f_out, stationname):
+def NOAAparse(f_in, f_out, stationname):
     # Set up connections to input and output files. The CSV library also helps
     #        with reading the input file, because we can treat it as space separated
     #        with consecutive spaces being collapsed together
@@ -178,104 +266,139 @@ def parsefile(f_in, f_out, stationname):
 
             # And we're done!  Now write the row to the output file
             writer.writerow(outrow)
-    if verbose:
-        sys.stdout.write("parsed.\n")
-    else:
-        # even if not verbose, we say something so the user can see it's working
-        sys.stdout.write(".")
+
     sys.stdout.flush() # need to flush the output buffer to show progress live
 
 
 # This is the main control function. Each pass gets the user's input to pick a
 #        station, and then loops over years to download the relevant files, calling
 #        parsefile() to parse each one into standard CSV
-def downloadfiles(maxyears):
+def NOAAdownload(code1, code2, scode=None, year1=None, year2=None):
     # get parameters for and start constructing filenames
     URLroot = "ftp://ftp.ncdc.noaa.gov/pub/data/gsod/" # base URL for all files
     filesuffix = ".op.gz" # suffix for all the raw files
     firstyear = 1928 # this is the first year available for any station
-    USAFcode = raw_input("Please enter the USAF code for the station you want " \
-        "data for (first column of  " \
-        "ftp://ftp.ncdc.noaa.gov/pub/data/inventories/ISH-HISTORY.TXT )\n")
-    WBANcode = raw_input("Please enter the WBAN code for the station you want " \
-        "data for (second column of " \
-        "ftp://ftp.ncdc.noaa.gov/pub/data/inventories/ISH-HISTORY.TXT )\n")
-    # e.g. Seattle (SEA) is USAF 727930 WBAN 24233
-    # Portland, OR is USAF 726980 WBAN 24229
-    # LHR is USAF 037720 WBAN 99999
-    stationname = raw_input("What would you like to call this station?\n")
+    USAFcode = code1
+    WBANcode = code2
+    #stationname = code1 + code2
     stationcode = str(USAFcode) + '-' + str(WBANcode)
+    stationname = stationcode
+    if scode:
+        stationname = scode + '-' + stationcode
 
+    if year2==None:
+        year2= datetime.datetime.now().year
+    if year1==None:
+        year1= year2
+    maxyears= year2-year1+1
+    print stationname, year1, year2
     yearsdownloaded = 0
 
-    for year in range(datetime.datetime.now().year-1, firstyear, -1):
-        # stopping before the current year because it's necessarily incomplete, and
-        #        looping back from last year, on the assumption that more recent years
-        #        are of greater interest and have higher quality data.
-        # First we assemble the URL for the year of interest
+    fn_out= stationname + '-' + str(year1) + '-' + str(year2) + '.csv'
+
+    for year in range(year1, year2+1, 1):
+        # start before the current year (it is incomplete)
+        # looping back from prior year to year.
+        #print "Year: %s" % year
+        
+        # First assemble the URL for the year of interest
         fullURL = (URLroot + str(year) + '/' + stationcode + '-' +
             str(year) + filesuffix)
         if verbose:
-            sys.stdout.write("Trying " + fullURL + " ... ")
-            sys.stdout.flush()
+            print "Trying %s  -- %s " % (year, fullURL)
 
         # Now we try to download the file, with very basic error handling if verbose
         try:
             urllib.urlretrieve(fullURL,str(year)+filesuffix)
-            if verbose: sys.stdout.write("retrieved ... ")
+            print "   ... retrieved ",
             yearsdownloaded += 1
         except IOError as e:
-            if verbose: print(" ")
             print(e)
         else: # if we got the file without any errors, then
             # uncompress the file
             f_in = gzip.open(str(year)+filesuffix)
-            if verbose: sys.stdout.write("decompressed ... ")
+            if verbose: 
+                print " ... decompressed ... ",
             # and start writing the output
             if yearsdownloaded == 1:
                 # since it's the first year, open the file and write the header row
                 firstyear = year
-                f_out = open(stationname+'.csv','w')
-                csv.writer(f_out).writerow(["Station", "Year", "Month", "Day", \
-                    "MeanTemp", "NTempObs", "DewPoint", "NDewPointObs", \
-                    "SeaLevelPressure", "NSeaLevPressObs", "StationPressure", \
-                    "NStatPressObs", "Visibility", "NVisibilityObs", "MeanWindSpeed", \
-                    "NWindObs", "MaxSustWindSpeed", "MaxWindGust", "MaxTemp",  \
-                    "MaxTempSource", "MinTemp", "MinTempSource", "PrecipAmount", \
-                    "NPrecipReportHours", "PrecipFlag", "SnowDepth", "Fog", "Rain", \
-                    "Snow", "Hail", "Thunder", "Tornado"])
+                f_out = open(fn_out,'w')
+                hx= [ "Station", "Year", "Month", "Day", \
+                      "MeanTemp", "NTempObs", "DewPoint", "NDewPointObs", \
+                      "SeaLevelPressure", "NSeaLevPressObs", "StationPressure", \
+                      "NStatPressObs", "Visibility", "NVisibilityObs", "MeanWindSpeed", \
+                      "NWindObs", "MaxSustWindSpeed", "MaxWindGust", "MaxTemp",  \
+                      "MaxTempSource", "MinTemp", "MinTempSource", "PrecipAmount", \
+                      "NPrecipReportHours", "PrecipFlag", "SnowDepth", "Fog", "Rain", \
+                      "Snow", "Hail", "Thunder", "Tornado" ]
+                csv.writer(f_out).writerow(hx)
+            
             # This function does the actual ETL
-            parsefile(f_in, f_out, stationname)
+            NOAAparse(f_in, f_out, stationname)
+
+            if verbose:
+                print "parsed."
+            
             # clean up after ourselves
             f_in.close()
             os.remove(str(year)+filesuffix)
+        
         urllib.urlcleanup()
+        
         if yearsdownloaded == maxyears:
             break # if we have enough years, then end this loop
         else:
             time.sleep(5) # slow down here to stop the server locking us out
+        
         time.sleep(1)
-    print("Successfully downloaded " + str(yearsdownloaded) + " years between " +
-        str(year) + " and " + str(firstyear) + " for station " + stationname)
+    
     if yearsdownloaded < maxyears:
         # If we didn't get as many years as requested, alert the user
         print("No more years are available at the NOAA website for this station.")
+    print("Successfully downloaded " + str(yearsdownloaded) + " years between " +
+           str(year) + " and " + str(firstyear) + " for station " + stationname)
+        
     f_out.close()
+    print 'Wrote output to %s'  % fn_out
 
+############################################
+# Extra
 
-# This is the main control loop. It repeatedly asks the user for station codes
-#        and calls downloadfiles() to download the requested data, until it's told
-#        to stop.
-#goagain = "Y"
-#while not (goagain.startswith('N') or goagain.startswith('n')):
-#    downloadfiles(maxyears)
-#    goagain = raw_input("Would you like to download another station (Y/N)?\n")
-#    while not (goagain.startswith('N') or goagain.startswith('n') or
-#        goagain.startswith('y') or goagain.startswith('Y')):
-#        goagain = raw_input("Please help me, I am but a stupid computer. " \
-#            "I can only understand Y or N as responses to this prompt. "
-#            "Would you like to download another station (Y/N)?\n")
+# Make list of stations
+def NOAAstations(fname) :
+    f1 = open(fname,'r')
+    stations=[]
+    for line in csv.reader(f1,delimiter=',', quotechar='"'):
+        stations.append(line)
+    f1.close()
+    stations= stations[1:]    
+    return stations
+    '"USAF","WBAN","STATION NAME","CTRY","FIPS","STATE","CALL","LAT","LON","ELEV(.1M)","BEGIN","END"\n'
 
-print 'NOAA weather station data downloader'
-print dt.now()
-print 40*'*'
+###############################################
+                
+if __name__ == '__main__' :
+
+    print 'NOAA weather station data downloader'
+    print dt.now()
+    print 40*'*'
+            
+    ##Download loop2
+
+    ## Pull out airport codes
+    alist2b=alist2.split("\n") 
+    for ax1 in alist2b[32:]:  # 1-4, 6-20, 21-31, 33-43
+        if ax1:
+            print
+            dt1= dt.now()
+            ax2=ax1.split("|")
+            #print ax2
+            scodes2= ax2[0].split()
+            (jj, scall, usaf, wban)= scodes2
+            if scall not in ('HNL', 'SJU', 'DEN', 'FLL', 'HOU'):
+                print scodes2, ax2[-1]  
+                year1= 2013
+                NOAAdownload(usaf, wban, scall, year1)
+            dt2= dt.now()
+            print '%s  | %s  seconds: %-4s' % (dt2.strftime('%Y-%m-%d %H:%M:%S'), (dt2-dt1), (dt2-dt1).seconds )
