@@ -262,12 +262,12 @@ def downloadfiles(maxyears):
 # This is the main control loop. It repeatedly asks the user for station codes
 #        and calls downloadfiles() to download the requested data, until it's told
 #        to stop.
-goagain = "Y"
-while not (goagain.startswith('N') or goagain.startswith('n')):
-    downloadfiles(maxyears)
-    goagain = raw_input("Would you like to download another station (Y/N)?\n")
-    while not (goagain.startswith('N') or goagain.startswith('n') or
-        goagain.startswith('y') or goagain.startswith('Y')):
-        goagain = raw_input("Please help me, I am but a stupid computer. " \
-            "I can only understand Y or N as responses to this prompt. "
-            "Would you like to download another station (Y/N)?\n")
+#goagain = "Y"
+#while not (goagain.startswith('N') or goagain.startswith('n')):
+#    downloadfiles(maxyears)
+#    goagain = raw_input("Would you like to download another station (Y/N)?\n")
+#    while not (goagain.startswith('N') or goagain.startswith('n') or
+#        goagain.startswith('y') or goagain.startswith('Y')):
+#        goagain = raw_input("Please help me, I am but a stupid computer. " \
+#            "I can only understand Y or N as responses to this prompt. "
+#            "Would you like to download another station (Y/N)?\n")
