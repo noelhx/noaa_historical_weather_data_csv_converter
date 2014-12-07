@@ -45,6 +45,7 @@
 #        iterate over them.
 
 import datetime
+from datetime import datetime as dt
 import urllib
 import os
 import gzip
@@ -274,3 +275,7 @@ def downloadfiles(maxyears):
 #        goagain = raw_input("Please help me, I am but a stupid computer. " \
 #            "I can only understand Y or N as responses to this prompt. "
 #            "Would you like to download another station (Y/N)?\n")
+
+print 'NOAA weather station data downloader'
+print dt.now()
+print 40*'*'
