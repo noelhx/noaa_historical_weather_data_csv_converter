@@ -400,6 +400,10 @@ if __name__ == '__main__' :
             if scall not in ('HNL', 'SJU', 'DEN', 'FLL', 'HOU'):
                 print scodes2, ax2[-1]  
                 year1= 2013
-                NOAAdownload(usaf, wban, scall, year1)
+                #NOAAdownload(usaf, wban, scall, year1)
             dt2= dt.now()
             print '%s  | %s  seconds: %-4s' % (dt2.strftime('%Y-%m-%d %H:%M:%S'), (dt2-dt1), (dt2-dt1).seconds )
+
+    print ' ... DONE'
+    print dt.now()
+    print 40*'*'
