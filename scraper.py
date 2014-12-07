@@ -61,8 +61,9 @@ else:
 
 # I've assumed you'll want the same number of years for every station you
 #        download in one session, so we ask this before going into the main loop.
-maxyears = int(raw_input("How many years of data would you like to download " \
-    "for each station?\n"))
+# maxyears = int(raw_input("How many years of data would you like to download " \
+#    "for each station?\n"))
+maxyears=1
 
 # This function goes through each downloaded file line by line, and translates
 #        it from NOAA's idiosyncratic format to CSV with all the fields separated
