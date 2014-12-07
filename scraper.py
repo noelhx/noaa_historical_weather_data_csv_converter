@@ -389,7 +389,7 @@ if __name__ == '__main__' :
 
     ## Pull out airport codes
     alist2b=alist2.split("\n") 
-    for ax1 in alist2b[:1]:  # 1-4, 6-20, 21-31, 33-43
+    for ax1 in alist2b[:]:  # 1-4, 6-20, 21-31, 33-43
         if ax1:
             print
             dt1= dt.now()
