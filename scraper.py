@@ -433,8 +433,8 @@ if __name__ == '__main__' :
     #hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
     print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
     for rx in dx:
-        #print dx
-        #dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
+        print rx
+        dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
         #if (dtx >= dt.date(2013,12,1)) and (dtx <= dt.date(2014,2,28)):         
         px = tuple(rx[0:4]) + (dtx,) + (rx[4],rx[20],rx[18], rx[22], rx[25]) + (rx[24], rx[27], rx[28])
         print '%10s %4s %2s %3s %10s %6s %6s %6s %6s %6s -- %1s %1s %1s' % px
