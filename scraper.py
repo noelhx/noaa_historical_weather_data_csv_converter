@@ -389,7 +389,7 @@ if __name__ == '__main__' :
 
     ## Pull out airport codes
     alist2b=alist2.split("\n") 
-    for ax1 in alist2b[:]:  # 1-4, 6-20, 21-31, 33-43
+    for ax1 in alist2b[:1]:  # 1-4, 6-20, 21-31, 33-43
         if ax1:
             print
             dt1= dt.now()
@@ -407,3 +407,23 @@ if __name__ == '__main__' :
     print ' ... DONE'
     print dt.now()
     print 40*'*'
+
+
+    station = str(scall) + '-' + str(usaf) + '-' + str(usaf)
+    year1=2013
+    year2=2014
+    fn2= station + '-' + str(year1) + '-' + str(year2) + '.csv'
+    
+    fx2 = open(fn2)
+    dx=[]   
+    for line in csv.reader(fx2, delimiter=',', quotechar='"'):
+        if (not line[0]=='Station' and not line[0]==''): 
+            dx.append(line)
+    fx2.close()
+    hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
+    print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
+    for rx in dx: 
+        dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
+        if (dtx >= dt.date(2013,12,1)) and (dtx <= dt.date(2014,2,28)):         
+            px = tuple(rx[0:4]) + (dtx,) + (rx[4],rx[20],rx[18], rx[22], rx[25]) + (rx[24], rx[27], rx[28])
+            print '%10s %4s %2s %3s %10s %6s %6s %6s %6s %6s -- %1s %1s %1s' % px
