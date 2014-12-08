@@ -434,7 +434,7 @@ if __name__ == '__main__' :
     print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
     for rx in dx[:3]:
         print rx
-        dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
+        dtx= dt(int(rx[1]), int(rx[2]), int(rx[3]))
         #if (dtx >= dt.date(2013,12,1)) and (dtx <= dt.date(2014,2,28)):         
         px = tuple(rx[0:4]) + (dtx,) + (rx[4],rx[20],rx[18], rx[22], rx[25]) + (rx[24], rx[27], rx[28])
         print '%10s %4s %2s %3s %10s %6s %6s %6s %6s %6s -- %1s %1s %1s' % px
