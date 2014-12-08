@@ -432,7 +432,7 @@ if __name__ == '__main__' :
           "Snow", "Hail", "Thunder", "Tornado" ]
     #hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
     print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
-    for rx in dx:
+    for rx in dx[:3]:
         print rx
         dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
         #if (dtx >= dt.date(2013,12,1)) and (dtx <= dt.date(2014,2,28)):         
