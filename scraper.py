@@ -399,8 +399,9 @@ if __name__ == '__main__' :
             (jj, scall, usaf, wban)= scodes2
             if scall not in ('HNL', 'SJU', 'DEN', 'FLL', 'HOU'):
                 print scodes2, ax2[-1]  
-                year1= 2013
-                NOAAdownload(usaf, wban, scall, year1)
+                year1= 2014
+                year2= 2014
+                NOAAdownload(usaf, wban, scall, year1, year2)
             dt2= dt.now()
             print '%s  | %s  seconds: %-4s' % (dt2.strftime('%Y-%m-%d %H:%M:%S'), (dt2-dt1), (dt2-dt1).seconds )
 
@@ -410,8 +411,8 @@ if __name__ == '__main__' :
 
 
     station = str(scall) + '-' + str(usaf) + '-' + str(wban)
-    year1=2013
-    year2=2014
+    #year1=2013
+    #year2=2014
     fn2= station + '-' + str(year1) + '-' + str(year2) + '.csv'
     
     print 'Reading %s' % fn2
@@ -432,7 +433,7 @@ if __name__ == '__main__' :
     #hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
     print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
     for rx in dx:
-        print dx
+        #print dx
         #dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
         #if (dtx >= dt.date(2013,12,1)) and (dtx <= dt.date(2014,2,28)):         
         px = tuple(rx[0:4]) + (dtx,) + (rx[4],rx[20],rx[18], rx[22], rx[25]) + (rx[24], rx[27], rx[28])
