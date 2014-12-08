@@ -414,13 +414,23 @@ if __name__ == '__main__' :
     year2=2014
     fn2= station + '-' + str(year1) + '-' + str(year2) + '.csv'
     
+    print 'Reading %s' % fn2
     fx2 = open(fn2)
     dx=[]   
     for line in csv.reader(fx2, delimiter=',', quotechar='"'):
         if (not line[0]=='Station' and not line[0]==''): 
             dx.append(line)
     fx2.close()
-    hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
+    hx= [ "Station", "Year", "Month", "Day", \
+          "MeanTemp", "NTempObs", "DewPoint", "NDewPointObs", \
+          "SeaLevelPressure", "NSeaLevPressObs", "StationPressure", \
+          "NStatPressObs", "Visibility", "NVisibilityObs", "MeanWindSpeed", \
+          "NWindObs", "MaxSustWindSpeed", "MaxWindGust", "MaxTemp",  \
+          "MaxTempSource", "MinTemp", "MinTempSource", "PrecipAmount", \
+          "NPrecipReportHours", "PrecipFlag", "SnowDepth", "Fog", "Rain", \
+          "Snow", "Hail", "Thunder", "Tornado" ]
+
+    #hx2 = tuple(hx[0:4]) + ("Date",) + (hx[4],hx[20],hx[18], hx[22], hx[25]) + (hx[24], hx[27], hx[28])
     print 'Station      Year Month Day    Date  MeanT   MinT   MaxT Precip  SnowD --Flags Precip Rain Snow'
     for rx in dx: 
         dtx= dt.date(int(rx[1]), int(rx[2]), int(rx[3]))
