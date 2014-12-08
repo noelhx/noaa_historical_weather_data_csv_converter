@@ -409,7 +409,7 @@ if __name__ == '__main__' :
     print 40*'*'
 
 
-    station = str(scall) + '-' + str(usaf) + '-' + str(usaf)
+    station = str(scall) + '-' + str(usaf) + '-' + str(wban)
     year1=2013
     year2=2014
     fn2= station + '-' + str(year1) + '-' + str(year2) + '.csv'
